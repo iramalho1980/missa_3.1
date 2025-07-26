@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Missa - Gerenciador de Cânticos</title>
+    <title>Missa 3.1 - Cânticos Litúrgicos</title>
     <style>
         * {
             margin: 0;
@@ -34,7 +34,7 @@
         .header h1 {
             font-size: 3rem;
             font-weight: 700;
-            background: linear-gradient(45deg, #ffffff, #ffff00, #ffff00);
+            background: linear-gradient(45deg, #ffffff, #ffff00, #ffffff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -43,16 +43,18 @@
         }
 
         .header p {
-            color: #cccccc;
             font-size: 1.2rem;
+            color: #cccccc;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
         .search-container {
+            position: relative;
             margin-bottom: 30px;
             display: flex;
             justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
         }
 
         .search-box {
@@ -60,119 +62,289 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 25px;
-            padding: 12px 20px;
+            padding: 15px 25px;
             color: #ffffff;
             font-size: 1rem;
-            width: 100%;
-            max-width: 300px;
+            width: 400px;
             outline: none;
             transition: all 0.3s ease;
-        }
-
-        .search-box::placeholder {
-            color: #aaaaaa;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .search-box:focus {
-            border-color: #ffff00;
-            box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+            border-color: rgba(255, 255, 0, 0.5);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.3);
         }
 
-        .category-filter {
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .missa-icon {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            padding: 12px 20px;
-            color: #ffffff;
-            font-size: 1rem;
-            outline: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%204%205%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M2%200L0%202h4zm0%205L0%203h4z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .category-filter option {
-            background-color: #333333;
-            color: #ffffff;
+        .missa-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.5);
         }
 
-        .category-filter:hover {
-            border-color: #ffff00;
+        .missa-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: #ffff00;
         }
 
-        .cantico-grid {
+        .categories-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
-            padding: 20px 0;
+            margin-bottom: 40px;
         }
 
-        .cantico-card {
-            background: rgba(255, 255, 255, 0.08);
+        .category-card {
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             padding: 25px;
-            text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
             position: relative;
             overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        .cantico-card::before {
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 0, 0.3);
+        }
+
+        .category-card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 70%);
-            transform: rotate(45deg);
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ffff00, #ffffff, #ffff00);
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.3s ease;
         }
 
-        .cantico-card:hover::before {
+        .category-card:hover::before {
             opacity: 1;
         }
 
-        .cantico-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: #ffff00;
-            box-shadow: 0 12px 40px 0 rgba(255, 255, 0, 0.4);
-        }
-
-        .cantico-card h2 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-            color: #ffff00;
-            text-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
-        }
-
-        .cantico-card p {
-            font-size: 1rem;
-            color: #dddddd;
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 15px;
         }
 
-        .cantico-card .category {
-            display: inline-block;
-            background-color: rgba(255, 255, 255, 0.2);
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: 600;
             color: #ffffff;
-            padding: 5px 15px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .expand-icon {
+            width: 24px;
+            height: 24px;
+            fill: #ffff00;
+            transition: transform 0.3s ease;
+        }
+
+        .category-card.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .songs-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .category-card.expanded .songs-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .songs-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .songs-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .songs-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 0, 0.5);
+            border-radius: 4px;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .song-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 0, 0.3);
+            transform: translateX(5px);
+        }
+
+        .song-name {
+            font-size: 0.95rem;
+            color: #ffffff;
+            flex: 1;
+        }
+
+        .song-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-add, .btn-view {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-add {
+            background: rgba(255, 255, 0, 0.2);
+            color: #ffff00;
+            border: 1px solid rgba(255, 255, 0, 0.3);
+        }
+
+        .btn-add:hover {
+            background: rgba(255, 255, 0, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.3);
+        }
+
+        .btn-view {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-view:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .missa-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .missa-panel.active {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .missa-panel h2 {
+            color: #ffff00;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            text-shadow: 0 0 10px rgba(255, 255, 0, 0.5);
+        }
+
+        .missa-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 15px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-top: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .missa-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #ffffff;
+        }
+
+        .missa-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-save, .btn-close {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-save {
+            background: linear-gradient(45deg, #ffff00, #ffd700);
+            color: #000000;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 255, 0, 0.3);
+        }
+
+        .btn-close {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-close:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .popup-overlay {
@@ -181,15 +353,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 999;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .popup-overlay.active {
@@ -197,436 +366,739 @@
             visibility: visible;
         }
 
-        .popup-content {
-            background: linear-gradient(135deg, rgba(44, 44, 44, 0.9), rgba(74, 74, 74, 0.9));
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 800px;
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
             width: 90%;
-            max-height: 90%;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
+            max-width: 800px;
+            max-height: 90vh;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 20px;
+            z-index: 1001;
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
 
-        .popup-overlay.active .popup-content {
-            transform: scale(1);
+        .popup.active {
+            transform: translate(-50%, -50%) scale(1);
         }
 
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .popup-title {
+            color: #ffff00;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .popup-close {
             background: none;
             border: none;
-            font-size: 2rem;
             color: #ffffff;
+            font-size: 1.5rem;
             cursor: pointer;
-            transition: color 0.3s ease;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
         }
 
-        .close-btn:hover {
-            color: #ffff00;
+        .popup-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(90deg);
         }
 
-        .popup-content h2 {
-            font-size: 2.5rem;
-            color: #ffff00;
-            margin-bottom: 20px;
+        .popup-content {
+            max-height: calc(90vh - 120px);
+            overflow: auto;
             text-align: center;
-            text-shadow: 0 0 15px rgba(255, 255, 0, 0.6);
         }
 
-        .popup-content pre {
-            background-color: rgba(0, 0, 0, 0.3);
+        .popup-content img {
+            max-width: 100%;
+            height: auto;
             border-radius: 10px;
-            padding: 20px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #e0e0e0;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        .footer {
-            text-align: center;
-            padding: 30px 0;
-            color: #aaaaaa;
+        .popup-content iframe {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .search-results {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-result-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffff00;
+            margin-bottom: 8px;
+        }
+
+        .result-category {
             font-size: 0.9rem;
-            margin-top: 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+
+        .result-preview {
+            font-size: 0.85rem;
+            color: #ffffff;
+            opacity: 0.8;
+            line-height: 1.4;
         }
 
         @media (max-width: 768px) {
             .header h1 {
-                font-size: 2.2rem;
-            }
-
-            .header p {
-                font-size: 1rem;
-            }
-
-            .search-container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .search-box,
-            .category-filter {
-                max-width: 90%;
-            }
-
-            .cantico-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .cantico-card {
-                padding: 20px;
-            }
-
-            .cantico-card h2 {
-                font-size: 1.5rem;
-            }
-
-            .popup-content {
-                padding: 25px;
-            }
-
-            .popup-content h2 {
                 font-size: 2rem;
             }
-
-            .popup-content pre {
-                font-size: 0.9rem;
+            
+            .search-container {
+                flex-direction: column;
+                gap: 15px;
             }
+            
+            .search-box {
+                width: 100%;
+                max-width: 350px;
+            }
+            
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .missa-panel {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .popup {
+                width: 95%;
+                padding: 15px;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #ffff00;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #ffff00;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h1>Missa - Gerenciador de Cânticos</h1>
-            <p>Encontre a letra perfeita para cada momento da celebração.</p>
-        </header>
+        <div class="header">
+            <h1>Missa 3.1</h1>
+            <p>Cânticos Litúrgicos - Tempo Comum</p>
+        </div>
 
-        <section class="search-container">
-            <input type="text" id="search-input" class="search-box" placeholder="Buscar cântico...">
-            <select id="category-filter" class="category-filter">
-                <option value="all">Todas as Categorias</option>
-                <option value="entrada">Entrada</option>
-                <option value="ato-penitencial">Ato Penitencial</option>
-                <option value="gloria">Glória</option>
-                <option value="salmo">Salmo</option>
-                <option value="aclamacao">Aclamação ao Evangelho</option>
-                <option value="ofertorio">Ofertório</option>
-                <option value="santo">Santo</option>
-                <option value="cordeiro">Cordeiro de Deus</option>
-                <option value="comunhao">Comunhão</option>
-                <option value="pos-comunhao">Pós-Comunhão</option>
-                <option value="final">Final</option>
-                <option value="diversos">Diversos</option>
-            </select>
-        </section>
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Pesquisar cânticos..." id="searchInput">
+            <div class="missa-icon" id="missaIcon" title="Criar Ordem de Missa">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+            </div>
+        </div>
 
-        <section class="cantico-grid" id="cantico-grid">
-            <!-- Cânticos serão carregados aqui pelo JavaScript -->
-        </section>
-    </div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Carregando cânticos...</p>
+        </div>
 
-    <div class="popup-overlay" id="popup-overlay">
-        <div class="popup-content">
-            <button class="close-btn">&times;</button>
-            <h2 id="popup-title"></h2>
-            <pre id="popup-lyrics"></pre>
+        <div class="search-results" id="searchResults">
+            <!-- Resultados da pesquisa aparecerão aqui -->
+        </div>
+
+        <div class="categories-grid" id="categoriesGrid">
+            <!-- Categorias serão carregadas aqui -->
         </div>
     </div>
 
-    <footer class="footer">
-        <p>&copy; 2023 Missa - Gerenciador de Cânticos. Todos os direitos reservados.</p>
-    </footer>
+    <!-- Popup para visualizar cânticos -->
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="popup" id="popup">
+        <div class="popup-header">
+            <h3 class="popup-title" id="popupTitle">Cântico</h3>
+            <button class="popup-close" id="popupClose">&times;</button>
+        </div>
+        <div class="popup-content" id="popupContent">
+            <!-- Conteúdo do cântico aparecerá aqui -->
+        </div>
+    </div>
+
+    <!-- Painel de criação de missa -->
+    <div class="popup-overlay" id="missaOverlay"></div>
+    <div class="missa-panel" id="missaPanel">
+        <h2>Criar Ordem de Missa</h2>
+        <div class="missa-list" id="missaList">
+            <!-- Lista de cânticos da missa aparecerá aqui -->
+        </div>
+        <div class="missa-controls">
+            <button class="btn-save" id="saveMissa">Salvar Missa</button>
+            <button class="btn-close" id="closeMissa">Fechar</button>
+        </div>
+    </div>
 
     <script>
-        const canticos = [
-            {
-                title: "Alegres Vamos",
-                category: "entrada",
-                lyrics: `Alegres vamos à casa do Pai
-E na alegria cantar seu louvor
-Em sua casa, somos irmãos
-Com muita paz e muito amor.
+        // Dados dos cânticos organizados por categoria
+        const canticosData = {
+            "1 - Entrada": [
+                "Entrada - Eu e Minha Casa Serviremos ao Senhor.pdf",
+                "a_biblia_e_a_palavra_de_deus.pdf",
+                "bom_pastor.pdf",
+                "coração_santo.pdf",
+                "creio.jpeg",
+                "cristo_ressucitou_aleluia.pdf",
+                "deixa_a_luz_do_ceu_entrar.pdf",
+                "eis_me_aqui_senhor.pdf",
+                "esatremos_aqui_reunidos.pdf",
+                "faco_novas_todas_as_coisas.pdf",
+                "hosana_hey_hosana_ha.pdf",
+                "por_sua_morte.pdf",
+                "porque_ele_vive.pdf",
+                "senhor_quem_entrara.pdf",
+                "te_amarei.pdf",
+                "toda_biblia_e_comunicacao.pdf",
+                "tu_es_a_razao_da_jornada.pdf",
+                "vem_louvar.pdf"
+            ],
+            "2 - Ato penitencial": [
+                "Ato Penitencial - Senhor, Piedade.pdf",
+                "Senhor que viestes salvar.jpeg",
+                "conheco_um_coracao.pdf",
+                "coracoes_arrependidos.pdf",
+                "kyrie_eleison_jmj.pdf",
+                "pelos_pecados_senhor_piedade_de_nos.pdf",
+                "perdao_senhor.pdf",
+                "renovame.pdf",
+                "renovame_ii.pdf",
+                "senhor_que_viestes_salvar_kirie_elleisson.pdf",
+                "senhor_tende_piedade_de_nos.pdf",
+                "senhor_tende_piedade_perdoai_nossa_culpa.pdf"
+            ],
+            "3 - Gloria": [
+                "Gloria a Deus nas alturas - Continuação.jpeg",
+                "Gloria a Deus nas alturas.jpeg",
+                "Glória - Eliana Ribeiro.pdf",
+                "a_ele_seja_a_gloria.pdf",
+                "gloria_a_deus_nas_alturas.pdf",
+                "gloria_a_deus_nas_alturas__rock_balada.pdf",
+                "gloria_ao_pai_criador.pdf"
+            ],
+            "4 - Aclamação ao evangelho": [
+                "a_minhalma_abrirei.pdf",
+                "a_vossa_palavra_senhor.pdf",
+                "aleluia_como_o_pai_me_amou.pdf",
+                "buscai_primeiro_o_reino_de_deus.pdf",
+                "como_sao_belos.pdf",
+                "eu_vim_para_escutar.pdf",
+                "palavra_de_salvacao.pdf",
+                "quando_estamos_unidos.pdf",
+                "que_alegria_cristo_ressurgiu.pdf",
+                "vai_falar_no_evangelho.pdf",
+                "vinde_espirito_de_deus.pdf"
+            ],
+            "5 - Ofertório": [
+                "a_mesa_santa_que_preparamos.pdf",
+                "de_maos_estendidas.pdf",
+                "meu_coracao_eh_para_ti.pdf",
+                "minha_vida_tem_sentido.pdf",
+                "muitos_graos_de_trigo.pdf",
+                "ofertas_singelas.pdf",
+                "os_dons_que_trago_aqui.jpeg",
+                "sabes_senhor.pdf",
+                "um_coracao_para_amar.pdf"
+            ],
+            "6 - Santo": [
+                "hosana_eh.pdf",
+                "hosana_no_alto_ceu.pdf",
+                "o_senhor_eh_santo.pdf",
+                "santo_santo_e.pdf",
+                "santo_santo_santo_eh_o_senhor.jpeg"
+            ],
+            "7 - Comunhão": [
+                "a_barca.pdf",
+                "a_ti_meu_deus.pdf",
+                "antes_da_morte_e_ressurreicao.pdf",
+                "cantar_a_beleza_da_vida.pdf",
+                "como_es_lindo.pdf",
+                "conheço_um_coração.pdf",
+                "da_cepa_brotou_a_rama.pdf",
+                "desamarrem_as_sandalias.pdf",
+                "eis_que_sou_o_pao_da_vida.jpeg",
+                "estas_entre_nos.pdf",
+                "este_pranto_em_minhas_maos.pdf",
+                "eu_navegarei.pdf",
+                "eu_quis_comer_esta_ceia_agora.pdf",
+                "eu_vim_para_que_todos_tenham_vida.pdf",
+                "pelos_prados.pdf",
+                "procuro_abrigo_nos_coracoes.pdf",
+                "quando_teu_pai_revelou.pdf",
+                "quem_nos_separara.pdf",
+                "sacramento_da_comunhao.pdf",
+                "sim_eu_quero.pdf",
+                "sonda_me.pdf",
+                "todo_aquele_que_comer.jpeg",
+                "vem_eu_mostrarei.pdf",
+                "vou_cantar_teu_amor.pdf"
+            ],
+            "8 - Ação de Graças": [
+                "deus_esta_aqui.pdf",
+                "e_impossivel_nao_crer_em_ti.pdf",
+                "espirito_santo.pdf",
+                "obrigado_senhor.pdf",
+                "so_em_ti.jpeg"
+            ],
+            "9 - Final": [
+                "a_alegria_esta_no_coracao.pdf",
+                "como_o_pai_me_enviou.pdf",
+                "cristo_eh_a_felicidade.pdf",
+                "deixa_luz_do_ceu_entrar.pdf",
+                "hoje_e_tempo_de_louvar.pdf",
+                "pelas_estradas_da_vida.pdf",
+                "segura_na_mao_de_deus.pdf",
+                "tomado_pela_mao.pdf",
+                "tu_es_razao_jornada.pdf"
+            ],
+            "10 - Abraço de Paz": [
+                "esteja_sempre_com_voce.pdf",
+                "irmao_minha_paz_eu_te_dou.pdf",
+                "paz_paz_de_cristo.pdf"
+            ],
+            "11 - Canticos Marianos": [
+                "a_escolhida.pdf",
+                "ave_cheia_de_graca.pdf",
+                "imaculada_maria_de_deus.pdf",
+                "maria_de_nazare.pdf",
+                "santa_mae_maria.pdf",
+                "santa_maria_vem.pdf"
+            ],
+            "12 - Louvor e meditação": [
+                "Desamarrem_as_sandálias.pdf",
+                "a_alegria_esta_no_coracao.pdf",
+                "a_nos_descei_divina_luz.pdf",
+                "agua_viva.pdf",
+                "amar_como_jesus_amou.pdf",
+                "bate_o_sino.pdf",
+                "eu_louvarei.pdf",
+                "eu_quero_um_rio.pdf",
+                "louvado_seja_o_meu_senhor.pdf",
+                "meu_mestre__a_minha_vida_e_do_mestre.pdf",
+                "noite_feliz.pdf",
+                "noites_traicoeiras.pdf",
+                "oracao_da_familia.pdf",
+                "oracao_de_sao_francisco.pdf",
+                "podes_reinar.pdf",
+                "quao_grande_es_tu.pdf",
+                "segura_na_mao_de_deus.pdf",
+                "tao_sublime.pdf",
+                "vou-cantar-teu-amor.pdf"
+            ],
+            "13 - Diversos": [
+                "Quando quero falar com Deus.jpeg",
+                "podes_reinar.pdf",
+                "prova_de_amor.pdf",
+                "É tão lindo falar com Deus.jpeg"
+            ]
+        };
 
-1. É bom estarmos juntos
-Nesta mesa do Senhor
-E sentirmos sua presença
-No calor do nosso amor.
-
-2. Ele nos chama à conversão
-Para o Reino de Deus
-E nos dá o seu perdão
-Para sermos filhos seus.
-
-3. Jesus Cristo é o caminho
-A verdade e a vida
-Ele nos guia e nos ensina
-Com sua palavra bendita.`
-            },
-            {
-                title: "Senhor, Que Viestes Salvar",
-                category: "ato-penitencial",
-                lyrics: `Senhor, que viestes salvar
-Os corações arrependidos.
-Kyrie, eleison!
-Kyrie, eleison!
-
-Ó Cristo, que viestes chamar
-Os pecadores humilhados.
-Christe, eleison!
-Christe, eleison!
-
-Senhor, que intercedeis por nós
-Junto a Deus Pai que nos perdoa.
-Kyrie, eleison!
-Kyrie, eleison!`
-            },
-            {
-                title: "Glória a Deus nas Alturas",
-                category: "gloria",
-                lyrics: `Glória a Deus nas alturas
-E paz na terra aos homens por Ele amados.
-Senhor Deus, Rei dos céus,
-Deus Pai todo-poderoso:
-nós vos louvamos,
-nós vos bendizemos,
-nós vos adoramos,
-nós vos glorificamos,
-nós vos damos graças por vossa imensa glória.
-
-Senhor Jesus Cristo, Filho Unigênito,
-Senhor Deus, Cordeiro de Deus,
-Filho de Deus Pai.
-Vós que tirais o pecado do mundo,
-tende piedade de nós.
-Vós que tirais o pecado do mundo,
-acolhei a nossa súplica.
-Vós que estais à direita do Pai,
-tende piedade de nós.
-
-Só vós sois o Santo;
-só vós, o Senhor;
-só vós, o Altíssimo, Jesus Cristo;
-com o Espírito Santo,
-na glória de Deus Pai.
-Amém.`
-            },
-            {
-                title: "O Senhor é Meu Pastor",
-                category: "salmo",
-                lyrics: `O Senhor é meu pastor,
-nada me faltará.
-Em verdes prados ele me faz repousar.
-
-1. Conduz-me às águas tranquilas,
-restaura as minhas forças.
-Guia-me por sendas justas,
-por amor do seu nome.
-
-2. Ainda que eu ande por vales tenebrosos,
-não temerei mal algum,
-porque tu estás comigo;
-o teu bordão e o teu cajado me consolam.
-
-3. Preparas para mim uma mesa
-à vista dos meus inimigos;
-unges com óleo a minha cabeça,
-e o meu cálice transborda.
-
-4. A bondade e a graça me seguirão
-todos os dias da minha vida;
-e habitarei na casa do Senhor
-para todo o sempre.`
-            },
-            {
-                title: "Aleluia, Quem Crê Em Mim",
-                category: "aclamacao",
-                lyrics: `Aleluia, aleluia, aleluia!
-Quem crê em mim, diz o Senhor,
-terá a vida eterna.
-Aleluia, aleluia, aleluia!`
-            },
-            {
-                title: "Bendito Sejas, Senhor",
-                category: "ofertorio",
-                lyrics: `Bendito sejas, Senhor,
-Deus do universo,
-pelo pão que recebemos
-da tua bondade,
-fruto da terra e do trabalho do homem,
-que hoje te apresentamos
-e que se tornará para nós
-pão da vida.
-
-Bendito sejas, Senhor,
-Deus do universo,
-pelo vinho que recebemos
-da tua bondade,
-fruto da videira e do trabalho do homem,
-que hoje te apresentamos
-e que se tornará para nós
-vinho da salvação.`
-            },
-            {
-                title: "Santo, Santo, Santo",
-                category: "santo",
-                lyrics: `Santo, Santo, Santo,
-Senhor Deus do universo!
-O céu e a terra proclamam a vossa glória.
-Hosana nas alturas!
-
-Bendito o que vem em nome do Senhor!
-Hosana nas alturas!`
-            },
-            {
-                title: "Cordeiro de Deus",
-                category: "cordeiro",
-                lyrics: `Cordeiro de Deus, que tirais o pecado do mundo,
-tende piedade de nós.
-
-Cordeiro de Deus, que tirais o pecado do mundo,
-tende piedade de nós.
-
-Cordeiro de Deus, que tirais o pecado do mundo,
-dai-nos a paz.`
-            },
-            {
-                title: "Prova de Amor Maior Não Há",
-                category: "comunhao",
-                lyrics: `Prova de amor maior não há
-Que doar a vida pelo irmão.
-
-1. Eu vos dou um novo mandamento:
-Que vos ameis uns aos outros,
-Assim como eu vos amei.
-
-2. Ninguém tem maior amor
-Do que aquele que dá a vida
-Pelos seus amigos.`
-            },
-            {
-                title: "Em Tua Presença",
-                category: "pos-comunhao",
-                lyrics: `Em tua presença, Senhor,
-encontramos a paz.
-Em tua palavra, a luz
-Que nos guia e satisfaz.
-
-1. Teu corpo e sangue, alimento,
-Que nos sustenta na jornada.
-Teu amor, o mandamento,
-Que nos conduz à morada.
-
-2. Em cada passo, a tua mão,
-Em cada dor, o teu consolo.
-Em cada prece, a oração,
-Que nos eleva ao teu colo.`
-            },
-            {
-                title: "Te Amarei, Senhor",
-                category: "final",
-                lyrics: `Te amarei, Senhor,
-Te amarei, Senhor,
-Eu só encontro a paz e a alegria
-Bem perto de ti.
-
-1. Eu te louvo, meu Senhor,
-Por teu imenso amor.
-Eu te adoro, meu Jesus,
-Minha força, minha luz.
-
-2. Em teus braços, ó Pai,
-Encontro o meu lugar.
-Em teu coração, Senhor,
-Quero sempre morar.`
-            },
-            {
-                title: "Ave Maria",
-                category: "diversos",
-                lyrics: `Ave Maria, cheia de graça,
-o Senhor é convosco.
-Bendita sois vós entre as mulheres,
-e bendito é o fruto do vosso ventre, Jesus.
-
-Santa Maria, Mãe de Deus,
-rogai por nós, pecadores,
-agora e na hora de nossa morte.
-Amém.`
-            }
+        // Ordem padrão da missa do tempo comum
+        const ordemMissaTempoComum = [
+            { categoria: "1 - Entrada", cantico: "vem_louvar.pdf" },
+            { categoria: "2 - Ato penitencial", cantico: "senhor_tende_piedade_de_nos.pdf" },
+            { categoria: "3 - Gloria", cantico: "gloria_a_deus_nas_alturas.pdf" },
+            { categoria: "4 - Aclamação ao evangelho", cantico: "a_vossa_palavra_senhor.pdf" },
+            { categoria: "5 - Ofertório", cantico: "ofertas_singelas.pdf" },
+            { categoria: "6 - Santo", cantico: "santo_santo_santo_eh_o_senhor.jpeg" },
+            { categoria: "7 - Comunhão", cantico: "eis_que_sou_o_pao_da_vida.jpeg" },
+            { categoria: "10 - Abraço de Paz", cantico: "paz_paz_de_cristo.pdf" },
+            { categoria: "8 - Ação de Graças", cantico: "obrigado_senhor.pdf" },
+            { categoria: "9 - Final", cantico: "segura_na_mao_de_deus.pdf" }
         ];
 
-        const searchInput = document.getElementById('search-input');
-        const categoryFilter = document.getElementById('category-filter');
-        const canticoGrid = document.getElementById('cantico-grid');
-        const popupOverlay = document.getElementById('popup-overlay');
-        const popupTitle = document.getElementById('popup-title');
-        const popupLyrics = document.getElementById('popup-lyrics');
-        const closeBtn = document.querySelector('.close-btn');
+        let currentMissa = [];
+        let allSongs = [];
 
-        function displayCanticos(filter = 'all', searchTerm = '') {
-            canticoGrid.innerHTML = '';
-            const filteredCanticos = canticos.filter(cantico => {
-                const matchesCategory = filter === 'all' || cantico.category === filter;
-                const matchesSearch = cantico.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                      cantico.lyrics.toLowerCase().includes(searchTerm.toLowerCase());
-                return matchesCategory && matchesSearch;
-            });
-
-            filteredCanticos.forEach(cantico => {
-                const card = document.createElement('div');
-                card.classList.add('cantico-card');
-                card.innerHTML = `
-                    <h2>${cantico.title}</h2>
-                    <p>${cantico.lyrics.substring(0, 100)}...</p>
-                    <span class="category">${cantico.category.replace('-', ' ').toUpperCase()}</span>
-                `;
-                card.addEventListener('click', () => openPopup(cantico));
-                canticoGrid.appendChild(card);
-            });
-        }
-
-        function openPopup(cantico) {
-            popupTitle.textContent = cantico.title;
-            popupLyrics.textContent = cantico.lyrics;
-            popupOverlay.classList.add('active');
-        }
-
-        closeBtn.addEventListener('click', () => {
-            popupOverlay.classList.remove('active');
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            setupEventListeners();
         });
 
-        popupOverlay.addEventListener('click', (e) => {
-            if (e.target === popupOverlay) {
-                popupOverlay.classList.remove('active');
+        function initializeApp() {
+            showLoading(true);
+            
+            // Criar lista de todos os cânticos para pesquisa
+            allSongs = [];
+            Object.keys(canticosData).forEach(category => {
+                canticosData[category].forEach(song => {
+                    allSongs.push({
+                        name: song,
+                        category: category,
+                        path: `Missa/${category}/${song}`
+                    });
+                });
+            });
+
+            // Carregar categorias
+            loadCategories();
+            
+            // Carregar ordem padrão da missa
+            loadDefaultMissaOrder();
+            
+            showLoading(false);
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            
+            if (show) {
+                loading.classList.add('active');
+                categoriesGrid.style.display = 'none';
+            } else {
+                loading.classList.remove('active');
+                categoriesGrid.style.display = 'grid';
             }
-        });
+        }
 
-        searchInput.addEventListener('input', (e) => {
-            displayCanticos(categoryFilter.value, e.target.value);
-        });
+        function loadCategories() {
+            const categoriesGrid = document.getElementById('categoriesGrid');
+            categoriesGrid.innerHTML = '';
 
-        categoryFilter.addEventListener('change', (e) => {
-            displayCanticos(e.target.value, searchInput.value);
-        });
+            Object.keys(canticosData).forEach(category => {
+                const categoryCard = createCategoryCard(category, canticosData[category]);
+                categoriesGrid.appendChild(categoryCard);
+            });
+        }
 
-        // Initial display
-        displayCanticos();
+        function createCategoryCard(category, songs) {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.innerHTML = `
+                <div class="category-header">
+                    <h3 class="category-title">${category}</h3>
+                    <svg class="expand-icon" viewBox="0 0 24 24">
+                        <path d="M7 10l5 5 5-5z"/>
+                    </svg>
+                </div>
+                <div class="songs-list">
+                    ${songs.map(song => createSongItem(song, category)).join('')}
+                </div>
+            `;
+
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.song-item')) {
+                    card.classList.toggle('expanded');
+                }
+            });
+
+            return card;
+        }
+
+        function createSongItem(song, category) {
+            const songName = formatSongName(song);
+            return `
+                <div class="song-item">
+                    <span class="song-name">${songName}</span>
+                    <div class="song-actions">
+                        <button class="btn-add" onclick="addToMissa('${song}', '${category}')">Adicionar</button>
+                        <button class="btn-view" onclick="viewSong('${song}', '${category}')">Ver</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatSongName(filename) {
+            return filename
+                .replace(/\.(pdf|jpeg|jpg)$/i, '')
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function setupEventListeners() {
+            // Pesquisa
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', handleSearch);
+
+            // Ícone da missa
+            const missaIcon = document.getElementById('missaIcon');
+            missaIcon.addEventListener('click', openMissaPanel);
+
+            // Popup
+            const popupClose = document.getElementById('popupClose');
+            const popupOverlay = document.getElementById('popupOverlay');
+            popupClose.addEventListener('click', closePopup);
+            popupOverlay.addEventListener('click', closePopup);
+
+            // Painel de missa
+            const closeMissa = document.getElementById('closeMissa');
+            const missaOverlay = document.getElementById('missaOverlay');
+            const saveMissa = document.getElementById('saveMissa');
+            
+            closeMissa.addEventListener('click', closeMissaPanel);
+            missaOverlay.addEventListener('click', closeMissaPanel);
+            saveMissa.addEventListener('click', saveMissaOrder);
+        }
+
+        function handleSearch() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const searchResults = document.getElementById('searchResults');
+            const categoriesGrid = document.getElementById('categoriesGrid');
+
+            if (searchTerm.length < 2) {
+                searchResults.classList.remove('active');
+                categoriesGrid.style.display = 'grid';
+                return;
+            }
+
+            const results = allSongs.filter(song => 
+                song.name.toLowerCase().includes(searchTerm) ||
+                song.category.toLowerCase().includes(searchTerm)
+            );
+
+            displaySearchResults(results);
+            searchResults.classList.add('active');
+            categoriesGrid.style.display = 'none';
+        }
+
+        function displaySearchResults(results) {
+            const searchResults = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                searchResults.innerHTML = '<p style="text-align: center; color: #cccccc; padding: 20px;">Nenhum cântico encontrado.</p>';
+                return;
+            }
+
+            searchResults.innerHTML = results.map(song => `
+                <div class="search-result-item" onclick="viewSong('${song.name}', '${song.category}')">
+                    <div class="result-title">${formatSongName(song.name)}</div>
+                    <div class="result-category">${song.category}</div>
+                    <div class="result-preview">Clique para visualizar o cântico</div>
+                </div>
+            `).join('');
+        }
+
+        function viewSong(songName, category) {
+            const popup = document.getElementById('popup');
+            const popupOverlay = document.getElementById('popupOverlay');
+            const popupTitle = document.getElementById('popupTitle');
+            const popupContent = document.getElementById('popupContent');
+
+            popupTitle.textContent = formatSongName(songName);
+            
+            const filePath = `Missa/${category}/${songName}`;
+            const fileExtension = songName.split('.').pop().toLowerCase();
+
+            if (fileExtension === 'pdf') {
+                popupContent.innerHTML = `<iframe src="${filePath}" type="application/pdf"></iframe>`;
+            } else if (['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+                popupContent.innerHTML = `<img src="${filePath}" alt="${formatSongName(songName)}">`;
+            } else {
+                popupContent.innerHTML = '<p style="color: #cccccc; text-align: center; padding: 40px;">Formato de arquivo não suportado.</p>';
+            }
+
+            popupOverlay.classList.add('active');
+            popup.classList.add('active');
+        }
+
+        function closePopup() {
+            const popup = document.getElementById('popup');
+            const popupOverlay = document.getElementById('popupOverlay');
+            
+            popup.classList.remove('active');
+            popupOverlay.classList.remove('active');
+        }
+
+        function addToMissa(songName, category) {
+            const song = {
+                name: songName,
+                category: category,
+                displayName: formatSongName(songName)
+            };
+
+            // Verificar se já existe
+            const exists = currentMissa.some(item => 
+                item.name === songName && item.category === category
+            );
+
+            if (!exists) {
+                currentMissa.push(song);
+                updateMissaDisplay();
+                
+                // Feedback visual
+                showNotification(`"${song.displayName}" adicionado à missa!`);
+            } else {
+                showNotification(`"${song.displayName}" já está na missa!`);
+            }
+        }
+
+        function openMissaPanel() {
+            const missaPanel = document.getElementById('missaPanel');
+            const missaOverlay = document.getElementById('missaOverlay');
+            
+            updateMissaDisplay();
+            missaOverlay.classList.add('active');
+            missaPanel.classList.add('active');
+        }
+
+        function closeMissaPanel() {
+            const missaPanel = document.getElementById('missaPanel');
+            const missaOverlay = document.getElementById('missaOverlay');
+            
+            missaPanel.classList.remove('active');
+            missaOverlay.classList.remove('active');
+        }
+
+        function updateMissaDisplay() {
+            const missaList = document.getElementById('missaList');
+            
+            if (currentMissa.length === 0) {
+                missaList.innerHTML = '<p style="text-align: center; color: #cccccc; padding: 20px;">Nenhum cântico adicionado ainda.</p>';
+                return;
+            }
+
+            missaList.innerHTML = currentMissa.map((song, index) => `
+                <div class="missa-item">
+                    <span>${song.displayName} (${song.category})</span>
+                    <button onclick="removeFromMissa(${index})" style="background: rgba(255,0,0,0.3); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Remover</button>
+                </div>
+            `).join('');
+        }
+
+        function removeFromMissa(index) {
+            currentMissa.splice(index, 1);
+            updateMissaDisplay();
+        }
+
+        function loadDefaultMissaOrder() {
+            currentMissa = ordemMissaTempoComum.map(item => ({
+                name: item.cantico,
+                category: item.categoria,
+                displayName: formatSongName(item.cantico)
+            }));
+        }
+
+        function saveMissaOrder() {
+            if (currentMissa.length === 0) {
+                showNotification('Adicione pelo menos um cântico à missa!');
+                return;
+            }
+
+            // Salvar no localStorage (banco de dados simples)
+            const missaData = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                songs: currentMissa
+            };
+
+            let savedMissas = JSON.parse(localStorage.getItem('missas') || '[]');
+            savedMissas.push(missaData);
+            localStorage.setItem('missas', JSON.stringify(savedMissas));
+
+            showNotification('Ordem de missa salva com sucesso!');
+            closeMissaPanel();
+        }
+
+        function showNotification(message) {
+            // Criar notificação temporária
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(255, 255, 0, 0.9);
+                color: #000;
+                padding: 15px 20px;
+                border-radius: 10px;
+                font-weight: 600;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Adicionar estilos de animação
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
-
 
