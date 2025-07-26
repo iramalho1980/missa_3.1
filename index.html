@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missa - Gerenciador de Cânticos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #2c2c2c 25%, #4a4a4a 50%, #6a6a6a 75%, #c0c0c0 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ffffff, #ffff00, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 255, 0, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #cccccc;
+            font-size: 1.2rem;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 15px 25px;
+            color: #ffffff;
+            font-size: 1rem;
+            width: 400px;
+            max-width: 100%;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #ffff00;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.3);
+        }
+
+        .search-box::placeholder {
+            color: #cccccc;
+        }
+
+        .missa-icon {
+            background: linear-gradient(45deg, #ffff00, #ffffff);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #000000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 255, 0, 0.3);
+        }
+
+        .missa-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(255, 255, 0, 0.5);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 0, 0.5);
+        }
+
+        .category-card.expanded {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 0, 0.7);
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .expand-icon {
+            background: none;
+            border: none;
+            color: #ffff00;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .expand-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .songs-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .songs-list.expanded {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .songs-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .songs-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .songs-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 0, 0.5);
+            border-radius: 4px;
+        }
+
+        .song-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .song-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 0, 0.3);
+            transform: translateX(5px);
+        }
+
+        .song-name {
+            color: #ffffff;
+            font-size: 0.95rem;
+            flex: 1;
+        }
+
+        .song-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-add {
+            background: linear-gradient(45deg, #ffff00, #ffffff);
+            border: none;
+            border-radius: 15px;
+            padding: 6px 12px;
+            color: #000000;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(255, 255, 0, 0.4);
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            position: relative;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .popup-close:hover {
+            color: #ffff00;
+        }
+
+        .missa-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            transition: right 0.3s ease;
+            z-index: 1001;
+            overflow-y: auto;
+        }
+
+        .missa-panel.open {
+            right: 0;
+        }
+
+        .missa-panel h2 {
+            color: #ffff00;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .missa-list {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 300px;
+            border: 2px dashed rgba(255, 255, 0, 0.3);
+        }
+
+        .missa-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+
+        .missa-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-missa {
+            flex: 1;
+            background: linear-gradient(45deg, #ffff00, #ffffff);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            color: #000000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-missa:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 255, 0, 0.4);
+        }
+
+        .search-results {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .search-results h3 {
+            color: #ffff00;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .missa-panel {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        .drag-over {
+            border-color: #ffff00 !important;
+            background: rgba(255, 255, 0, 0.1) !important;
+        }
+
+        .dragging {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Missa</h1>
+            <p>Gerenciador de Cânticos Litúrgicos</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Pesquisar cânticos..." id="searchInput">
+            <button class="missa-icon" onclick="toggleMissaPanel()" title="Criar Ordem de Missa">
+                ⛪
+            </button>
+        </div>
+
+        <div class="search-results" id="searchResults">
+            <h3>Resultados da Pesquisa</h3>
+            <div id="searchResultsList"></div>
+        </div>
+
+        <div class="categories-grid" id="categoriesGrid">
+            <!-- Categorias serão carregadas dinamicamente -->
+        </div>
+    </div>
+
+    <!-- Popup para visualizar cânticos -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-content">
+            <button class="popup-close" onclick="closePopup()">&times;</button>
+            <div id="popupContent"></div>
+        </div>
+    </div>
+
+    <!-- Painel lateral para criar ordem de missa -->
+    <div class="missa-panel" id="missaPanel">
+        <h2>Ordem da Missa</h2>
+        <div class="missa-controls">
+            <button class="btn-missa" onclick="saveMissa()">Salvar</button>
+            <button class="btn-missa" onclick="loadMissa()">Carregar</button>
+            <button class="btn-missa" onclick="clearMissa()">Limpar</button>
+        </div>
+        <div class="missa-list" id="missaList" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <p style="text-align: center; color: #cccccc; margin-top: 100px;">
+                Arraste os cânticos aqui ou use o botão "Adicionar"
+            </p>
+        </div>
+        <button class="btn-missa" onclick="toggleMissaPanel()" style="margin-top: 20px;">Fechar</button>
+    </div>
+
+    <script>
+        // Dados das categorias e cânticos
+        const categories = {
+            "1 - Entrada": [
+                "Entrada - Eu e Minha Casa Serviremos ao Senhor.pdf",
+                "a_biblia_e_a_palavra_de_deus (1).pdf",
+                "a_biblia_e_a_palavra_de_deus.pdf",
+                "bom_pastor.pdf",
+                "coração_santo.pdf",
+                "cristo_ressucitou_aleluia.pdf",
+                "deixa_a_luz_do_ceu_entrar.pdf",
+                "eis_me_aqui_senhor.pdf",
+                "esatremos_aqui_reunidos.pdf",
+                "faco_novas_todas_as_coisas.pdf",
+                "hosana_hey_hosana_ha.pdf",
+                "por_sua_morte.pdf",
+                "porque_ele_vive.pdf",
+                "senhor_quem_entrara.pdf",
+                "te_amarei.pdf",
+                "toda_biblia_e_comunicacao.pdf",
+                "tu_es_a_razao_da_jornada.pdf",
+                "vem_louvar.pdf"
+            ],
+            "2 - Ato penitencial": [
+                "Ato Penitencial - Senhor, Piedade.pdf",
+                "conheco_um_coracao.pdf",
+                "coracoes_arrependidos.pdf",
+                "kyrie_eleison_jmj.pdf",
+                "pelos_pecados_senhor_piedade_de_nos.pdf",
+                "perdao_senhor.pdf",
+                "renovame.pdf",
+                "renovame_ii.pdf",
+                "senhor_que_viestes_salvar_kirie_elleisson.pdf",
+                "senhor_tende_piedade_de_nos.pdf",
+                "senhor_tende_piedade_perdoai_nossa_culpa.pdf"
+            ],
+            "3 - Gloria": [
+                "Glória - Eliana Ribeiro.pdf",
+                "a_ele_seja_a_gloria.pdf",
+                "gloria_a_deus_nas_alturas.pdf",
+                "gloria_a_deus_nas_alturas__rock_balada.pdf",
+                "gloria_ao_pai_criador.pdf"
+            ],
+            "4 - Aclamação ao evangelho": [
+                "Aclamação - Quando Estamos Unidos.pdf",
+                "a_minhalma_abrirei.pdf",
+                "a_vossa_palavra_senhor.pdf",
+                "aleluia_como_o_pai_me_amou.pdf",
+                "buscai_primeiro_o_reino_de_deus.pdf",
+                "como_sao_belos.pdf",
+                "eu_vim_para_escutar.pdf",
+                "palavra_de_salvacao.pdf",
+                "que_alegria_cristo_ressurgiu.pdf",
+                "vai_falar_no_evangelho.pdf",
+                "vinde_espirito_de_deus.pdf"
+            ],
+            "5 - Ofertório": [
+                "a_mesa_santa_que_preparamos.pdf",
+                "de_maos_estendidas.pdf",
+                "meu_coracao_eh_para_ti.pdf",
+                "minha_vida_tem_sentido.pdf",
+                "muitos_graos_de_trigo.pdf",
+                "ofertas_singelas.pdf",
+                "sabes_senhor.pdf",
+                "um_coracao_para_amar.pdf"
+            ],
+            "6 - Santo": [
+                "hosana_eh.pdf",
+                "hosana_no_alto_ceu.pdf",
+                "o_senhor_eh_santo.pdf",
+                "santo_santo_e.pdf"
+            ],
+            "7 - Comunhão": [
+                "a_barca.pdf",
+                "a_ti_meu_deus.pdf",
+                "antes_da_morte_e_ressurreicao.pdf",
+                "cantar_a_beleza_da_vida.pdf",
+                "como_es_lindo.pdf",
+                "conheço_um_coração.pdf",
+                "da_cepa_brotou_a_rama.pdf",
+                "desamarrem_as_sandalias.pdf",
+                "estas_entre_nos.pdf",
+                "este_pranto_em_minhas_maos.pdf",
+                "eu_navegarei.pdf",
+                "eu_quis_comer_esta_ceia_agora.pdf",
+                "eu_vim_para_que_todos_tenham_vida.pdf",
+                "pelos_prados.pdf",
+                "procuro_abrigo_nos_coracoes.pdf",
+                "quando_teu_pai_revelou.pdf",
+                "quem_nos_separara.pdf",
+                "sacramento_da_comunhao.pdf",
+                "sim_eu_quero.pdf",
+                "sonda_me.pdf",
+                "vem_eu_mostrarei.pdf",
+                "vou_cantar_teu_amor.pdf"
+            ],
+            "8 - Ação de Graças": [
+                "deus_esta_aqui.pdf",
+                "e_impossivel_nao_crer_em_ti.pdf",
+                "espirito_santo.pdf",
+                "obrigado_senhor.pdf"
+            ],
+            "9 - Final": [
+                "a_alegria_esta_no_coracao.pdf",
+                "como_o_pai_me_enviou.pdf",
+                "cristo_eh_a_felicidade.pdf",
+                "deixa_luz_do_ceu_entrar.pdf",
+                "hoje_e_tempo_de_louvar.pdf",
+                "pelas_estradas_da_vida.pdf",
+                "segura_na_mao_de_deus.pdf",
+                "tomado_pela_mao.pdf",
+                "tu_es_razao_jornada.pdf"
+            ],
+            "10 - Abraço de Paz": [
+                "esteja_sempre_com_voce.pdf",
+                "irmao_minha_paz_eu_te_dou.pdf",
+                "paz_paz_de_cristo.pdf"
+            ],
+            "11 - Canticos Marianos": [
+                "a_escolhida.pdf",
+                "ave_cheia_de_graca.pdf",
+                "imaculada_maria_de_deus.pdf",
+                "maria_de_nazare.pdf",
+                "santa_mae_maria.pdf",
+                "santa_maria_vem.pdf"
+            ],
+            "12 - Louvor e meditação": [
+                "Desamarrem_as_sandálias.pdf",
+                "a_alegria_esta_no_coracao.pdf",
+                "a_nos_descei_divina_luz.pdf",
+                "agua_viva.pdf",
+                "amar_como_jesus_amou.pdf",
+                "bate_o_sino.pdf",
+                "eu_louvarei.pdf",
+                "eu_quero_um_rio.pdf",
+                "louvado_seja_o_meu_senhor.pdf",
+                "meu_mestre__a_minha_vida_e_do_mestre.pdf",
+                "noite_feliz.pdf",
+                "noites_traicoeiras.pdf",
+                "oracao_da_familia.pdf",
+                "oracao_de_sao_francisco.pdf",
+                "podes_reinar.pdf",
+                "quao_grande_es_tu.pdf",
+                "segura_na_mao_de_deus.pdf",
+                "tao_sublime.pdf",
+                "vou-cantar-teu-amor.pdf"
+            ],
+            "13 - Diversos": [
+                "podes_reinar.pdf",
+                "prova_de_amor.pdf"
+            ]
+        };
+
+        let currentMissa = [];
+        let allSongs = [];
+
+        // Inicializar aplicação
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+            setupSearch();
+            loadAllSongs();
+        });
+
+        function loadCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = '';
+
+            Object.keys(categories).forEach(categoryName => {
+                const card = createCategoryCard(categoryName, categories[categoryName]);
+                grid.appendChild(card);
+            });
+        }
+
+        function createCategoryCard(categoryName, songs) {
+            const card = document.createElement('div');
+            card.className = 'category-card';
+            card.innerHTML = `
+                <div class="category-header">
+                    <h3 class="category-title">${categoryName}</h3>
+                    <button class="expand-icon" onclick="toggleCategory(this)">▼</button>
+                </div>
+                <div class="songs-list">
+                    ${songs.map(song => `
+                        <div class="song-item" draggable="true" ondragstart="drag(event)" data-song="${song}" data-category="${categoryName}">
+                            <span class="song-name">${formatSongName(song)}</span>
+                            <div class="song-actions">
+                                <button class="btn-add" onclick="addToMissa('${song}', '${categoryName}')">Adicionar</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            return card;
+        }
+
+        function formatSongName(filename) {
+            return filename.replace(/\.pdf$|\.jpeg$|\.jpg$/i, '').replace(/_/g, ' ');
+        }
+
+        function toggleCategory(button) {
+            const card = button.closest('.category-card');
+            const songsList = card.querySelector('.songs-list');
+            const isExpanded = songsList.classList.contains('expanded');
+
+            if (isExpanded) {
+                songsList.classList.remove('expanded');
+                card.classList.remove('expanded');
+                button.classList.remove('rotated');
+            } else {
+                songsList.classList.add('expanded');
+                card.classList.add('expanded');
+                button.classList.add('rotated');
+            }
+        }
+
+        function loadAllSongs() {
+            allSongs = [];
+            Object.keys(categories).forEach(category => {
+                categories[category].forEach(song => {
+                    allSongs.push({
+                        name: song,
+                        category: category,
+                        displayName: formatSongName(song)
+                    });
+                });
+            });
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                if (query.length > 2) {
+                    performSearch(query);
+                } else {
+                    hideSearchResults();
+                }
+            });
+        }
+
+        function performSearch(query) {
+            const results = allSongs.filter(song => 
+                song.displayName.toLowerCase().includes(query) ||
+                song.category.toLowerCase().includes(query)
+            );
+
+            displaySearchResults(results);
+        }
+
+        function displaySearchResults(results) {
+            const searchResults = document.getElementById('searchResults');
+            const resultsList = document.getElementById('searchResultsList');
+
+            if (results.length === 0) {
+                hideSearchResults();
+                return;
+            }
+
+            resultsList.innerHTML = results.map(song => `
+                <div class="song-item" onclick="openSong('${song.name}', '${song.category}')">
+                    <span class="song-name">${song.displayName}</span>
+                    <div class="song-actions">
+                        <button class="btn-add" onclick="event.stopPropagation(); addToMissa('${song.name}', '${song.category}')">Adicionar</button>
+                    </div>
+                </div>
+            `).join('');
+
+            searchResults.style.display = 'block';
+        }
+
+        function hideSearchResults() {
+            document.getElementById('searchResults').style.display = 'none';
+        }
+
+        function openSong(songName, category) {
+            const popup = document.getElementById('popupOverlay');
+            const content = document.getElementById('popupContent');
+            
+            const filePath = `/missa/Missa/${category}/${songName}`;
+            const isImage = songName.toLowerCase().includes('.jpeg') || songName.toLowerCase().includes('.jpg');
+            
+            if (isImage) {
+                content.innerHTML = `<img src="${filePath}" style="max-width: 100%; height: auto; border-radius: 10px;">`;
+            } else {
+                content.innerHTML = `<embed src="${filePath}" type="application/pdf" width="100%" height="600px" style="border-radius: 10px;">`;
+            }
+            
+            popup.style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+
+        function toggleMissaPanel() {
+            const panel = document.getElementById('missaPanel');
+            panel.classList.toggle('open');
+        }
+
+        function addToMissa(songName, category) {
+            const song = {
+                name: songName,
+                category: category,
+                displayName: formatSongName(songName)
+            };
+
+            currentMissa.push(song);
+            updateMissaDisplay();
+        }
+
+        function updateMissaDisplay() {
+            const missaList = document.getElementById('missaList');
+            
+            if (currentMissa.length === 0) {
+                missaList.innerHTML = `
+                    <p style="text-align: center; color: #cccccc; margin-top: 100px;">
+                        Arraste os cânticos aqui ou use o botão "Adicionar"
+                    </p>
+                `;
+                return;
+            }
+
+            missaList.innerHTML = currentMissa.map((song, index) => `
+                <div class="missa-item" draggable="true" ondragstart="dragMissaItem(event, ${index})">
+                    <span onclick="openSong('${song.name}', '${song.category}')" style="cursor: pointer;">
+                        ${song.displayName}
+                    </span>
+                    <button onclick="removeFromMissa(${index})" style="background: none; border: none; color: #ff4444; cursor: pointer;">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function removeFromMissa(index) {
+            currentMissa.splice(index, 1);
+            updateMissaDisplay();
+        }
+
+        function clearMissa() {
+            currentMissa = [];
+            updateMissaDisplay();
+        }
+
+        function saveMissa() {
+            const name = prompt('Nome da missa:');
+            if (name && currentMissa.length > 0) {
+                const savedMissas = JSON.parse(localStorage.getItem('savedMissas') || '{}');
+                savedMissas[name] = [...currentMissa];
+                localStorage.setItem('savedMissas', JSON.stringify(savedMissas));
+                alert('Missa salva com sucesso!');
+            }
+        }
+
+        function loadMissa() {
+            const savedMissas = JSON.parse(localStorage.getItem('savedMissas') || '{}');
+            const names = Object.keys(savedMissas);
+            
+            if (names.length === 0) {
+                alert('Nenhuma missa salva encontrada.');
+                return;
+            }
+
+            const name = prompt('Escolha uma missa para carregar:\\n' + names.join('\\n'));
+            if (name && savedMissas[name]) {
+                currentMissa = [...savedMissas[name]];
+                updateMissaDisplay();
+                alert('Missa carregada com sucesso!');
+            }
+        }
+
+        // Drag and Drop functionality
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
+
+        function drag(ev) {
+            const songName = ev.target.dataset.song;
+            const category = ev.target.dataset.category;
+            ev.dataTransfer.setData("song", songName);
+            ev.dataTransfer.setData("category", category);
+            ev.target.classList.add('dragging');
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            
+            const songName = ev.dataTransfer.getData("song");
+            const category = ev.dataTransfer.getData("category");
+            
+            if (songName && category) {
+                addToMissa(songName, category);
+            }
+        }
+
+        function dragMissaItem(ev, index) {
+            ev.dataTransfer.setData("missaIndex", index);
+        }
+
+        // Remove drag-over class when drag leaves
+        document.addEventListener('dragleave', function(ev) {
+            if (ev.target.classList.contains('missa-list')) {
+                ev.target.classList.remove('drag-over');
+            }
+        });
+
+        document.addEventListener('dragend', function(ev) {
+            ev.target.classList.remove('dragging');
+        });
+
+        // Click handlers for song items
+        document.addEventListener('click', function(ev) {
+            if (ev.target.classList.contains('song-name') && !ev.target.closest('.song-actions')) {
+                const songItem = ev.target.closest('.song-item');
+                const songName = songItem.dataset.song;
+                const category = songItem.dataset.category;
+                openSong(songName, category);
+            }
+        });
+
+        // Close popup when clicking outside
+        document.getElementById('popupOverlay').addEventListener('click', function(ev) {
+            if (ev.target === this) {
+                closePopup();
+            }
+        });
+    </script>
+</body>
+</html>
+
