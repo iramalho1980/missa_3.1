@@ -1019,7 +1019,10 @@
             missaList.innerHTML = currentMissa.map((song, index) => `
                 <div class="missa-item">
                     <span>${song.displayName} (${song.category})</span>
-                    <button onclick="removeFromMissa(${index})" style="background: rgba(255,0,0,0.3); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Remover</button>
+                    <div class="song-actions">
+                        <button class="btn-view" onclick="viewSong(\'${song.name}\', \'${song.category}\')">Ver</button>
+                        <button onclick="removeFromMissa(${index})" style="background: rgba(255,0,0,0.3); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer;">Remover</button>
+                    </div>
                 </div>
             `).join('');
         }
