@@ -1124,3 +1124,106 @@
 </body>
 </html>
 
+
+
+            <button class="btn-clear" id="btnClearMissa">Limpar</button>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const missaIcon = document.getElementById('missaIcon');
+        const missaPanel = document.getElementById('missaPanel');
+        const missaOverlay = document.getElementById('missaOverlay');
+        const btnCloseMissa = missaPanel.querySelector('.btn-close');
+        const btnSaveMissa = missaPanel.querySelector('.btn-save');
+        const btnClearMissa = document.getElementById('btnClearMissa');
+        const missaList = document.getElementById('missaList');
+
+        let currentMissaOrder = [];
+
+        // Load saved missa order from localStorage
+        const loadMissaOrder = () => {
+            const savedOrder = localStorage.getItem('missaOrder');
+            if (savedOrder) {
+                currentMissaOrder = JSON.parse(savedOrder);
+                renderMissaList();
+            }
+        };
+
+        // Save missa order to localStorage
+        const saveMissaOrder = () => {
+            localStorage.setItem('missaOrder', JSON.stringify(currentMissaOrder));
+        };
+
+        const renderMissaList = () => {
+            missaList.innerHTML = '';
+            if (currentMissaOrder.length === 0) {
+                missaList.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.6);">Nenhum cântico adicionado.</p>';
+                return;
+            }
+            currentMissaOrder.forEach((item, index) => {
+                const missaItem = document.createElement('div');
+                missaItem.classList.add('missa-item');
+                missaItem.innerHTML = `
+                    <span>${item.name} (${item.category})</span>
+                    <button class="btn-remove" data-index="${index}">&times;</button>
+                `;
+                missaList.appendChild(missaItem);
+            });
+
+            document.querySelectorAll('.btn-remove').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    currentMissaOrder.splice(index, 1);
+                    saveMissaOrder();
+                    renderMissaList();
+                });
+            });
+        };
+
+        // Open Missa Panel
+        missaIcon.addEventListener('click', () => {
+            missaPanel.classList.add('active');
+            missaOverlay.classList.add('active');
+            renderMissaList();
+        });
+
+        // Close Missa Panel
+        btnCloseMissa.addEventListener('click', () => {
+            missaPanel.classList.remove('active');
+            missaOverlay.classList.remove('active');
+        });
+
+        missaOverlay.addEventListener('click', () => {
+            missaPanel.classList.remove('active');
+            missaOverlay.classList.remove('active');
+        });
+
+        // Save Missa Order (now persists)
+        btnSaveMissa.addEventListener('click', () => {
+            saveMissaOrder();
+            alert('Ordem da missa salva com sucesso!');
+            missaPanel.classList.remove('active');
+            missaOverlay.classList.remove('active');
+        });
+
+        // Clear Missa Order
+        btnClearMissa.addEventListener('click', () => {
+            currentMissaOrder = [];
+            saveMissaOrder();
+            renderMissaList();
+            alert('Ordem da missa limpa!');
+        });
+
+        // Add song to missa order (assuming this functionality exists elsewhere and calls addSongToMissaOrder)
+        window.addSongToMissaOrder = (songName, songCategory) => {
+            currentMissaOrder.push({ name: songName, category: songCategory });
+            saveMissaOrder();
+            renderMissaList();
+        };
+
+        loadMissaOrder(); // Load on page load
+    });
+</script>
+
