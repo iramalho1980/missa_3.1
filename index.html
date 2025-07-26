@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Missa 3.1 - Cânticos Litúrgicos</title>
+    <title>Pasta Digital | e-Missa</title>
     <style>
         * {
             margin: 0;
@@ -347,6 +347,17 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
+        .btn-clear {
+            background: rgba(255, 99, 71, 0.2);
+            color: #ff6347;
+            border: 1px solid rgba(255, 99, 71, 0.3);
+        }
+
+        .btn-clear:hover {
+            background: rgba(255, 99, 71, 0.3);
+            box-shadow: 0 0 10px rgba(255, 99, 71, 0.3);
+        }
+
         .popup-overlay {
             position: fixed;
             top: 0;
@@ -545,7 +556,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Missa 3.1</h1>
+            <h1>Pasta Digital | e-Missa</h1>
             <p>Cânticos Litúrgicos - Tempo Comum</p>
         </div>
 
@@ -593,6 +604,7 @@
         </div>
         <div class="missa-controls">
             <button class="btn-save" id="saveMissa">Salvar Missa</button>
+            <button class="btn-clear" id="clearMissa">Limpar</button>
             <button class="btn-close" id="closeMissa">Fechar</button>
         </div>
     </div>
@@ -801,10 +813,19 @@
             // Carregar categorias
             loadCategories();
             
-            // Carregar ordem padrão da missa
-            loadDefaultMissaOrder();
+            // Carregar ordem padrão da missa ou missa salva
+            loadMissaFromLocalStorage();
             
             showLoading(false);
+        }
+
+        function loadMissaFromLocalStorage() {
+            const savedMissa = localStorage.getItem('currentMissa');
+            if (savedMissa) {
+                currentMissa = JSON.parse(savedMissa);
+            } else {
+                loadDefaultMissaOrder();
+            }
         }
 
         function showLoading(show) {
@@ -892,11 +913,13 @@
             // Painel de missa
             const closeMissa = document.getElementById('closeMissa');
             const missaOverlay = document.getElementById('missaOverlay');
-            const saveMissa = document.getElementById('saveMissa');
+            const saveMissa = document.getElementById("saveMissa");
+            const clearMissaBtn = document.getElementById("clearMissa");
             
-            closeMissa.addEventListener('click', closeMissaPanel);
-            missaOverlay.addEventListener('click', closeMissaPanel);
-            saveMissa.addEventListener('click', saveMissaOrder);
+            closeMissa.addEventListener("click", closeMissaPanel);
+            missaOverlay.addEventListener("click", closeMissaPanel);
+            saveMissa.addEventListener("click", saveMissaOrder);
+            clearMissaBtn.addEventListener("click", clearMissa);
         }
 
         function handleSearch() {
@@ -1042,23 +1065,19 @@
 
         function saveMissaOrder() {
             if (currentMissa.length === 0) {
-                showNotification('Adicione pelo menos um cântico à missa!');
+                showNotification("Adicione pelo menos um cântico à missa!");
                 return;
             }
 
-            // Salvar no localStorage (banco de dados simples)
-            const missaData = {
-                id: Date.now(),
-                date: new Date().toISOString(),
-                songs: currentMissa
-            };
-
-            let savedMissas = JSON.parse(localStorage.getItem('missas') || '[]');
-            savedMissas.push(missaData);
-            localStorage.setItem('missas', JSON.stringify(savedMissas));
-
-            showNotification('Ordem de missa salva com sucesso!');
+            localStorage.setItem("currentMissa", JSON.stringify(currentMissa));
+            showNotification("Ordem de missa salva com sucesso!");
             closeMissaPanel();
+        }
+
+        function clearMissa() {
+            currentMissa = [];
+            updateMissaDisplay();
+            showNotification("Campos limpos com sucesso!");
         }
 
         function showNotification(message) {
